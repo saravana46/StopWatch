@@ -1,7 +1,7 @@
 //
 //  ViewController.swift
 //  StopWatchTimer
-//com.app.StopWatchTimer.StopWatchTimer
+//
 //  Created by Saravana on 28/10/22.
 //
 
@@ -9,7 +9,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    //var backgroundTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
+    var backgroundTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var timerLabel: UILabel!
@@ -25,65 +25,44 @@ class ViewController: UIViewController {
     var minutes: Int = 0
     
     var lapRecorded: String = ""
+    var watchlist : watchModel?
+    var stopViewModel = StopViewModel()
     
     var timerStarted: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        stopViewModel.delegate = self
         initialLoads()
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
-    
+    @objc func applicationDidEnterBackground(_ notification: NotificationCenter) {
+        
+        if timerStarted{
+            self.inBackground()
+        }
+    }
     @IBAction func startButtonTabbed(_ sender: Any) {
-        if timerStarted == false {
-            
-            if bgtask == 0 {
-                bgtask = 1
-                //registerBackgroundTask()
-            }
-            timerStarted = true
-            
-            inBackground()
-            
-            startButton.isEnabled = false
-            resetButton.isEnabled = true
-            pauseButton.isEnabled = true
+        watchlist = watchModel()
+        watchlist?.start = true
+        if let start = watchlist {
+            stopViewModel.startWatch(start: start.start)
         }
     }
     
     @IBAction func pauseButtonTabbed(_ sender: Any) {
-        if timerStarted == true {
-            timerStarted = false
-            timer.invalidate()
-            pauseButton.isEnabled = false
-            startButton.isEnabled = true
-            resetButton.isEnabled = true
-            
-            if bgtask == 1{
-                //endBackgroundTask()
-                bgtask = 0
-            }
+        watchlist = watchModel()
+        watchlist?.start = true
+        if let start = watchlist {
+            stopViewModel.pauseWatch(start: start.start)
         }
     }
     
     @IBAction func resetbuttonTabbed(_ sender: Any) {
-        
-        timer.invalidate()
-        
-         fractions = 0
-         seconds = 0
-         minutes = 0
-        
-         timerStarted = false
-        
-        startButton.isEnabled = true
-        pauseButton.isEnabled = false
-        resetButton.isEnabled = false
-        
-        timerLabel.text = "00:00.00"
-        
-        if bgtask == 1{
-            //endBackgroundTask()
-            bgtask = 0
+        watchlist = watchModel()
+        watchlist?.start = true
+        if let start = watchlist {
+            stopViewModel.resetWatch(start: start.start)
         }
     }
     
@@ -108,13 +87,26 @@ extension ViewController {
     }
     
     func inBackground() {
-        timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
+    }
+    
+    func registerBackgroundTask() {
+        backgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
+            self?.endBackgroundTask()
+        }
+        assert(backgroundTask != UIBackgroundTaskIdentifier.invalid)
+    }
+    
+    func endBackgroundTask() {
+        
+        UIApplication.shared.endBackgroundTask(backgroundTask)
+        backgroundTask = UIBackgroundTaskIdentifier.invalid
     }
     
     @objc func updateTimer(){
         fractions += 1
         
-        if fractions == 100 {
+        if fractions == 60 {
             fractions = 0
             seconds += 1
         }
@@ -129,7 +121,68 @@ extension ViewController {
         let secStr: String = seconds > 9 ? "\(seconds)" : "0\(seconds)"
         let minStr: String = minutes > 9 ? "\(minutes)" : "0\(minutes)"
         
-        timerLabel.text = "\(minStr):\(secStr).\(fracStr)"
+        timerLabel.text = "\(minStr):\(secStr):\(fracStr)"
     }
     
+}
+
+extension ViewController: StopViewModelDelegate {
+    func pauseWatch(start: Bool) {
+        if start {
+            if timerStarted == true {
+                timerStarted = false
+                timer.invalidate()
+                pauseButton.isEnabled = false
+                startButton.isEnabled = true
+                resetButton.isEnabled = true
+                
+                if bgtask == 1{
+                    endBackgroundTask()
+                    bgtask = 0
+                }
+            }
+        }
+    }
+    
+    func resetWatch(start: Bool) {
+        if start{
+            timer.invalidate()
+            
+            fractions = 0
+            seconds = 0
+            minutes = 0
+            
+            timerStarted = false
+            
+            startButton.isEnabled = true
+            pauseButton.isEnabled = false
+            resetButton.isEnabled = false
+            
+            timerLabel.text = "00:00:00"
+            
+            if bgtask == 1{
+                endBackgroundTask()
+                bgtask = 0
+            }
+        }
+    }
+    
+    func startWatch(start: Bool) {
+        if start {
+            if timerStarted == false {
+                
+                if bgtask == 0 {
+                    bgtask = 1
+                    registerBackgroundTask()
+                }
+                timerStarted = true
+                
+                inBackground()
+                
+                startButton.isEnabled = false
+                resetButton.isEnabled = true
+                pauseButton.isEnabled = true
+            }
+        }
+    }
 }

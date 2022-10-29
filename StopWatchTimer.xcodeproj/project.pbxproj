@@ -13,6 +13,8 @@
 		18037F8D290BE00700DDF710 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18037F8C290BE00700DDF710 /* Assets.xcassets */; };
 		18037F90290BE00700DDF710 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18037F8E290BE00700DDF710 /* LaunchScreen.storyboard */; };
 		185F2B5E290C00950000277B /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185F2B5D290C00950000277B /* Extension.swift */; };
+		18DA7624290D39A40097D7FF /* StopViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DA7623290D39A40097D7FF /* StopViewModel.swift */; };
+		18DA7626290D39B80097D7FF /* StopModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DA7625290D39B80097D7FF /* StopModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		18037F8F290BE00700DDF710 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		18037F91290BE00700DDF710 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		185F2B5D290C00950000277B /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
+		18DA7623290D39A40097D7FF /* StopViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopViewModel.swift; sourceTree = "<group>"; };
+		18DA7625290D39B80097D7FF /* StopModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +91,7 @@
 		185F2B5A290BFD660000277B /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				18DA7625290D39B80097D7FF /* StopModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -103,6 +108,7 @@
 		185F2B5C290BFD780000277B /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				18DA7623290D39A40097D7FF /* StopViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -178,9 +184,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				18DA7624290D39A40097D7FF /* StopViewModel.swift in Sources */,
 				185F2B5E290C00950000277B /* Extension.swift in Sources */,
 				18037F88290BE00500DDF710 /* ViewController.swift in Sources */,
 				18037F84290BE00500DDF710 /* AppDelegate.swift in Sources */,
+				18DA7626290D39B80097D7FF /* StopModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
