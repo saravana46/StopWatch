@@ -35,12 +35,7 @@ class ViewController: UIViewController {
         stopViewModel.delegate = self
         initialLoads()
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
-    }
-    @objc func applicationDidEnterBackground(_ notification: NotificationCenter) {
-        
-        if timerStarted{
-            self.inBackground()
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
     @IBAction func startButtonTabbed(_ sender: Any) {
         watchlist = watchModel()
@@ -86,8 +81,28 @@ extension ViewController {
         
     }
     
+    @objc func applicationDidEnterBackground(_ notification: NotificationCenter) {
+        
+        if timerStarted{
+            self.timer.invalidate()
+            self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateBgTimer), userInfo: nil, repeats: true)
+        }
+    }
+    @objc func applicationWillEnterForeground(_ notification: NotificationCenter) {
+        
+        if timerStarted{
+            inBackground()
+        }
+        
+    }
+    
     func inBackground() {
-        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
+        self.timer.invalidate()
+        self.timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
+    }
+    
+    @objc func updateBgTimer(){
+        self.updateTimer(true)
     }
     
     func registerBackgroundTask() {
@@ -103,25 +118,45 @@ extension ViewController {
         backgroundTask = UIBackgroundTaskIdentifier.invalid
     }
     
-    @objc func updateTimer(){
-        fractions += 1
+    @objc func updateTimer(_ bgRun:Bool = false){
         
-        if fractions == 60 {
-            fractions = 0
+        if !bgRun{
+            fractions += 1
+            
+            if fractions == 100 {
+                fractions = 0
+                seconds += 1
+            }
+            
+            if seconds == 60 {
+                seconds = 0
+                minutes += 1
+            }
+            
+            
+            let fracStr: String = fractions > 9 ? "\(fractions)" : "0\(fractions)"
+            let secStr: String = seconds > 9 ? "\(seconds)" : "0\(seconds)"
+            let minStr: String = minutes > 9 ? "\(minutes)" : "0\(minutes)"
+            
+            timerLabel.text = "\(minStr):\(secStr).\(fracStr)"
+            
+        }else{
+            
             seconds += 1
+            if seconds == 60 {
+                seconds = 0
+                minutes += 1
+            }
+            
+            let fracStr: String = fractions > 9 ? "\(fractions)" : "0\(fractions)"
+            let secStr: String = seconds > 9 ? "\(seconds)" : "0\(seconds)"
+            let minStr: String = minutes > 9 ? "\(minutes)" : "0\(minutes)"
+            
+            timerLabel.text = "\(minStr):\(secStr).\(fracStr)"
+            
+            
         }
-        
-        if seconds == 60 {
-            seconds = 0
-            minutes += 1
-        }
-        
-        
-        let fracStr: String = fractions > 9 ? "\(fractions)" : "0\(fractions)"
-        let secStr: String = seconds > 9 ? "\(seconds)" : "0\(seconds)"
-        let minStr: String = minutes > 9 ? "\(minutes)" : "0\(minutes)"
-        
-        timerLabel.text = "\(minStr):\(secStr):\(fracStr)"
+        print(timerLabel.text)
     }
     
 }
